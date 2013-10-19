@@ -1,0 +1,4 @@
+﻿  ConsoleDemo.cxx
+c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(133): warning C4018: '<' : signed/unsigned mismatch
+c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(147): warning C4018: '<' : signed/unsigned mismatch
+  ConsoleDemo.vcxproj -> C:\Users\LLP-admin\Desktop\DepthSenseSDK\samples\ConsoleDemo\Debug\ConsoleDemo.exe

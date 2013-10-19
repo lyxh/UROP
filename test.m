@@ -1,0 +1,10 @@
+function yp = test(t,y)
+mu = 1/82.45;
+mus = 1-mu;
+r1 = norm([y(1)+mu, y(3)]);   % Distance to the earth
+r2 = norm([y(1)-mus, y(3)]);  % Distance to the moon
+yp(1) = y(2);
+yp(2) = 2*y(4) + y(1) - mus*(y(1)+mu)/r1^3 - mu*(y(1)-mus)/r2^3;
+yp(3) = y(4);
+yp(4) = -2*y(2) + y(3) - mus*y(3)/r1^3 - mu*y(3)/r2^3;
+% yp = yp';
