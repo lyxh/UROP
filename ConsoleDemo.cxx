@@ -1,21 +1,3 @@
-// SoftKinetic DepthSense SDK
-//
-// COPYRIGHT AND CONFIDENTIALITY NOTICE - SOFTKINETIC CONFIDENTIAL
-// INFORMATION
-//
-// All rights reserved to SOFTKINETIC SENSORS NV (a
-// company incorporated and existing under the laws of Belgium, with
-// its principal place of business at Boulevard de la Plainelaan 15,
-// 1050 Brussels (Belgium), registered with the Crossroads bank for
-// enterprises under company number 0811 341 454 - "Softkinetic
-// Sensors").
-//
-// The source code of the SoftKinetic DepthSense Camera Drivers is
-// proprietary and confidential information of Softkinetic Sensors NV.
-//
-// For any question about terms and conditions, please contact:
-// info@softkinetic.com Copyright (c) 2002-2013 Softkinetic Sensors NV
-
 #include <stdlib.h>
 #include <iostream>
 #include <sstream>
@@ -27,19 +9,72 @@
 using namespace std;
 using namespace DepthSense;
 
+//added
+#define BOOST_ALL_NO_LIB
+
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+#include <boost/interprocess/sync/interprocess_mutex.hpp>
+
+using namespace std;
+using namespace boost::interprocess;
+//added end
+
 Context g_context;
 uint32_t g_cFrames = 0;
 uint32_t g_dFrames = 0;
-const int frame_NUM = 1;
-
+const int frame_NUM = 10;
 const int height = 240;
 const int width = 320;
-
-const int color_height = 240*2;
-const int color_width = 320*2;
-
+const int color_height = 240 * 2;
+const int color_width = 320 * 2;
 int color_data[color_height*color_width * 3][frame_NUM];
 float depth_data[height*width][frame_NUM];
+
+
+//edded
+struct sharedImage
+{
+	enum { width = 320 };
+	enum { height = 240 };
+	enum { dataLength = width*height*sizeof(unsigned short) };//sizeof(unsigned short)=4
+
+	sharedImage(){}
+	interprocess_mutex mutex;
+	unsigned short  data[dataLength];
+};
+
+shared_memory_object shm;
+sharedImage * sIm;
+mapped_region region;
+
+int setupSharedMemory(){
+	// Clear the object if it exists
+	shared_memory_object::remove("ImageMem");
+
+	shm = shared_memory_object(create_only  /*only create*/, "ImageMem" /*name*/, read_write/*read-write mode*/);
+
+	printf("Size of the shared image:%i\n", sizeof(sharedImage));
+	//Set size
+	shm.truncate(sizeof(sharedImage));
+
+	//Map the whole shared memory in this process
+	region = mapped_region(shm, read_write);
+
+	//Get the address of the mapped region
+	void * addr = region.get_address();
+
+	//Construct the shared structure in the preallocated memory of shm
+	sIm = new (addr)sharedImage;
+	return 0;
+}
+
+
+int shutdownSharedMemory(){
+	shared_memory_object::remove("ImageMem");
+	return 0;
+}
 
 static void error(const char* message)
 {
@@ -98,41 +133,37 @@ static void onNewColorSample(ColorNode obj, ColorNode::NewSampleReceivedData dat
 {
 	cout << "New color sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl;
 	for (int i = 0; i < color_height*color_width * 2; i++){
-		//cout << data.depthMap[1] << endl;
 		color_data[i][g_dFrames] = data.colorMap[i];
 	}
-	//cout << data.captureConfiguration.compression << endl;
-   //do not compress!	So shoul be YUY2 data cout 
-	//<< data.compressedData[0] << endl;
 	g_cFrames++;
 	// Quit the main loop after 200 depth frames received
 	if (g_cFrames >= frame_NUM)
-    	g_context.quit();
-
+		g_context.quit();
 }
 
 
 static void onNewDepthSample(DepthNode obj, DepthNode::NewSampleReceivedData data)
 {
-	cout << "New depth sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl; 
+	cout << "New depth sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl;
 	for (int i = 0; i < height*width; i++){
-		//cout << data.depthMap[1] << endl;
 		depth_data[i][g_dFrames] = data.depthMap[i];
 	}
+	memcpy(sIm->data, data.depthMap, sIm->dataLength);
 	g_dFrames++;
 	// Quit the main loop after 200 depth frames received
 	//if (g_dFrames >= frame_NUM)
-		//g_context.quit();	
+	//g_context.quit();        
 }
 
 static void writeDepthTxt(){
 	ofstream fl("depths.txt");
 	if (!fl)
-	{		cout << "file could not be open for writing ! " << endl;
+	{
+		cout << "file could not be open for writing ! " << endl;
 	}
 	for (int frame = 0; frame < g_dFrames; frame++){
 		for (int i = 0; i < height*width; i++){
-				fl << depth_data[i][frame] << endl;
+			fl << depth_data[i][frame] << endl;
 		}
 	}
 	fl.close();
@@ -146,7 +177,7 @@ static void writeColorTxt(){
 	}
 	for (int frame = 0; frame < g_cFrames; frame++){
 		for (int i = 0; i < color_height*color_width * 2; i++){
-				fl << color_data[i][frame] << endl;
+			fl << color_data[i][frame] << endl;
 		}
 	}
 	fl.close();
@@ -157,7 +188,6 @@ int main(int argc, char** argv)
 	// create a connection to the DepthSense server at localhost
 	g_context = Context::create();
 
-
 	DepthNode depthNode = getFirstAvailableDepthNode(g_context);
 	if (!depthNode.isSet())
 		error("no depth node found");
@@ -165,9 +195,7 @@ int main(int argc, char** argv)
 	depthNode.newSampleReceivedEvent().connect(onNewDepthSample);
 	g_context.registerNode(depthNode);
 
-	
 	// get the first available color sensor
-	
 	ColorNode colorNode = getFirstAvailableColorNode(g_context);
 	if (!colorNode.isSet())
 		error("no color node found");
@@ -175,13 +203,14 @@ int main(int argc, char** argv)
 	colorNode.newSampleReceivedEvent().connect(onNewColorSample);
 	g_context.registerNode(colorNode);
 
+	setupSharedMemory();
 	// start streaming
 	g_context.startNodes();
-
 	// start the DepthSense main event loop
 	g_context.run();
 	g_context.stopNodes();
+	shutdownSharedMemory();
 	//writeDepthTxt();
-	writeColorTxt();
+	//writeColorTxt();
 	return 0;
-	}
+}

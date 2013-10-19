@@ -1,4 +1,10 @@
 ﻿  ConsoleDemo.cxx
-c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(133): warning C4018: '<' : signed/unsigned mismatch
-c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(147): warning C4018: '<' : signed/unsigned mismatch
+  Unknown compiler version - please run the configure tests and report the results
+c:\program files (x86)\microsoft visual studio 12.0\vc\include\stdint.h(129): warning C4005: 'INT64_C' : macro redefinition
+          c:\users\llp-admin\desktop\depthsensesdk\include\depthsensetypes.h(49) : see previous definition of 'INT64_C'
+c:\program files (x86)\microsoft visual studio 12.0\vc\include\stdint.h(134): warning C4005: 'UINT64_C' : macro redefinition
+          c:\users\llp-admin\desktop\depthsensesdk\include\depthsensetypes.h(50) : see previous definition of 'UINT64_C'
+c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(164): warning C4018: '<' : signed/unsigned mismatch
+c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(178): warning C4018: '<' : signed/unsigned mismatch
+ConsoleDemo.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
   ConsoleDemo.vcxproj -> C:\Users\LLP-admin\Desktop\DepthSenseSDK\samples\ConsoleDemo\Debug\ConsoleDemo.exe
