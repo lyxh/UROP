@@ -24,13 +24,13 @@ using namespace boost::interprocess;
 Context g_context;
 uint32_t g_cFrames = 0;
 uint32_t g_dFrames = 0;
-const int frame_NUM = 10;
+const int frame_NUM = 1000;
 const int height = 240;
 const int width = 320;
 const int color_height = 240 * 2;
 const int color_width = 320 * 2;
-int color_data[color_height*color_width * 3][frame_NUM];
-float depth_data[height*width][frame_NUM];
+//int color_data[color_height*color_width * 3][frame_NUM];
+//float depth_data[height*width][frame_NUM];
 
 
 //edded
@@ -131,30 +131,30 @@ static DepthNode getFirstAvailableDepthNode(Context context)
 
 static void onNewColorSample(ColorNode obj, ColorNode::NewSampleReceivedData data)
 {
-	cout << "New color sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl;
-	for (int i = 0; i < color_height*color_width * 2; i++){
-		color_data[i][g_dFrames] = data.colorMap[i];
-	}
+	//cout << "New color sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl;
+	//for (int i = 0; i < color_height*color_width * 2; i++){
+		//color_data[i][g_dFrames] = data.colorMap[i];
+	//}
 	g_cFrames++;
 	// Quit the main loop after 200 depth frames received
-	if (g_cFrames >= frame_NUM)
-		g_context.quit();
+	//if (g_cFrames >= frame_NUM)
+		//g_context.quit();
 }
 
 
 static void onNewDepthSample(DepthNode obj, DepthNode::NewSampleReceivedData data)
 {
-	cout << "New depth sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl;
-	for (int i = 0; i < height*width; i++){
-		depth_data[i][g_dFrames] = data.depthMap[i];
-	}
+	//cout << "New depth sample received (timeOfCapture=" << data.timeOfCapture << ")" << endl;
+	//for (int i = 0; i < height*width; i++){
+	//	depth_data[i][g_dFrames] = data.depthMap[i];
+	//}
 	memcpy(sIm->data, data.depthMap, sIm->dataLength);
 	g_dFrames++;
 	// Quit the main loop after 200 depth frames received
 	//if (g_dFrames >= frame_NUM)
 	//g_context.quit();        
 }
-
+/*
 static void writeDepthTxt(){
 	ofstream fl("depths.txt");
 	if (!fl)
@@ -182,7 +182,7 @@ static void writeColorTxt(){
 	}
 	fl.close();
 }
-
+*/
 int main(int argc, char** argv)
 {
 	// create a connection to the DepthSense server at localhost

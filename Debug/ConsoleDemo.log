@@ -4,7 +4,4 @@ c:\program files (x86)\microsoft visual studio 12.0\vc\include\stdint.h(129): wa
           c:\users\llp-admin\desktop\depthsensesdk\include\depthsensetypes.h(49) : see previous definition of 'INT64_C'
 c:\program files (x86)\microsoft visual studio 12.0\vc\include\stdint.h(134): warning C4005: 'UINT64_C' : macro redefinition
           c:\users\llp-admin\desktop\depthsensesdk\include\depthsensetypes.h(50) : see previous definition of 'UINT64_C'
-c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(164): warning C4018: '<' : signed/unsigned mismatch
-c:\users\llp-admin\desktop\depthsensesdk\samples\consoledemo\consoledemo.cxx(178): warning C4018: '<' : signed/unsigned mismatch
-ConsoleDemo.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
   ConsoleDemo.vcxproj -> C:\Users\LLP-admin\Desktop\DepthSenseSDK\samples\ConsoleDemo\Debug\ConsoleDemo.exe
