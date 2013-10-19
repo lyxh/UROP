@@ -2,9 +2,7 @@ function SK
 RemoveInvalidPixel=false;
 AverageFilter=true;
 drawPath=true;
-smoothPath=false;
-biggerPath=false;
-connectPath=false;
+smoothPath=true;
 UpdateNFrames=2; 
 %need to average the data, so that the path is smoother(like a build in average)
 CU=struct; % CleanUp struct for closing the pmd camera etc.
@@ -136,46 +134,27 @@ while(RunLoop)
          end
          path_num_points=path_num_points+1;
          path_points(path_num_points,1)=dist_min_row;
-         path_points(path_num_points,2)=dist_min_col;
+         ,dist_min_col];
          
          %add the point to the path
          path(dist_min_row,dist_min_col)=0;
          %also smooth the path
-         smooth_path=path;
-         if (biggerPath)
-             path(dist_min_row-1,dist_min_col)=0;
-             path(dist_min_row+1,dist_min_col)=0;
-             path(dist_min_row,dist_min_col-1)=0;
-             path(dist_min_row,dist_min_col+1)=0;
-             path(dist_min_row-1,dist_min_col-1)=0;
-             path(dist_min_row+1,dist_min_col+1)=0;
-             path(dist_min_row+1,dist_min_col-1)=0;
-             path(dist_min_row-1,dist_min_col+1)=0;             
-         end
-         if (smoothPath)
-             a = 1;
-             b = [1/8 3/8 3/8 1/8];
-             for j=1:n
-                x = path(:,j);           
-                smooth_path(:,j) = filter(b,a,x);
+         
+         if (smoothPath && path_num_points~=1)
+             %first, calculate the slope
+             x1=path_points(path_num_points-1)(1);
+             y1=path_points(path_num_points-1)(2);
+             x2=path_points(path_num_points)(1);
+             x2=path_points(path_num_points)(2);
+             if y1==y2
+                 slope=0;
+             else
+                 slope=tan(y2-y1,x2-x1);
              end
-             for i=1:n
-                x = path(i,:);
-                smooth_path(i,:) = filter(b,a,x);
-             end
-         end 
-         if (connectPath)
-             x2=dist_min_row;
-             y2=dist_min_col;
-             x1=path_points(path_num_points-1,1);
-             y1=path_points(path_num_points-1,2);
-             if (x1~=x2)
-             end
-         end
-
+         end   
          %show the path on the graph
          if(drawPath)
-            set(hpath,'CData',smooth_path');
+            set(hpath,'CData',path');
          end    
            set(hdist,'CData',dist_processed');
          drawnow;

@@ -188,6 +188,7 @@ int main(int argc, char** argv)
 	// create a connection to the DepthSense server at localhost
 	g_context = Context::create();
 
+	
 	DepthNode depthNode = getFirstAvailableDepthNode(g_context);
 	if (!depthNode.isSet())
 		error("no depth node found");
@@ -196,12 +197,14 @@ int main(int argc, char** argv)
 	g_context.registerNode(depthNode);
 
 	// get the first available color sensor
+	/*
 	ColorNode colorNode = getFirstAvailableColorNode(g_context);
 	if (!colorNode.isSet())
 		error("no color node found");
 	colorNode.setEnableColorMap(true);
 	colorNode.newSampleReceivedEvent().connect(onNewColorSample);
 	g_context.registerNode(colorNode);
+	*/
 
 	setupSharedMemory();
 	// start streaming
